@@ -1,0 +1,6 @@
+[submodule "TaskMaster-Frontend"]
+	path = TaskMaster-Frontend
+	url = https://github.com/sapunethmini/TaskMaster-Frontend.git
+[submodule "TaskMaster-ApiGetway"]
+	path = TaskMaster-ApiGetway
+	url = https://github.com/sapunethmini/TaskMaster-ApiGetway.git

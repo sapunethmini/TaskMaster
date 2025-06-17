@@ -1,0 +1,147 @@
+networks:
+  microservices-network:
+    driver: bridge
+
+volumes:
+  mysql-user-data:
+  mysql-task-data:
+
+services:
+  eureka-server:
+    build: ./Eureka-Server
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - microservices-network
+
+  api-gateway:
+    build:
+      context: ./Api-getware  # FIXED: Changed from ./api-gateway to ./Api-getware
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsL", "http://localhost:8080/actuator/health"]
+      interval: 15s
+      timeout: 5s
+      start_period: 45s
+      retries: 5
+    networks:
+      - microservices-network
+
+  mysql-user:
+    image: mysql:8.0
+    container_name: mysql-user
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-user-data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=9090
+      - MYSQL_DATABASE=employeeSystem
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - microservices-network
+
+  mysql-task:
+    image: mysql:8.0
+    container_name: mysql-task
+    ports:
+      - "3309:3306"
+    volumes:
+      - mysql-task-data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=9090
+      - MYSQL_DATABASE=taskdb
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - microservices-network
+
+  user-service:
+    build: ./User-Service
+    container_name: user-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      mysql-user:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-user:3306/employeeSystem?autoReconnect=true&failOverReadOnly=false&maxReconnects=10
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka
+    networks:
+      - microservices-network
+
+  task-service:
+    build: ./Task-Service
+    container_name: task-service
+    ports:
+      - "8084:8084"
+    depends_on:
+      mysql-task:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-task:3306/taskdb?autoReconnect=true&failOverReadOnly=false&maxReconnects=10
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka
+    networks:
+      - microservices-network
+
+  notification-service:
+    build: ./Notification-Service
+    container_name: notification-service
+    ports:
+      - "8085:8085"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    restart: on-failure
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka
+      - EMAIL_USERNAME=saragamage111@gmail.com
+      - EMAIL_PASSWORD=Kusum2000
+    networks:
+      - microservices-network
+
+  frontend:
+    build: ./Frontend
+    container_name: frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      api-gateway:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - microservices-network

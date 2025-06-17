@@ -90,10 +90,9 @@ mvn spring-boot:run
 
 | Service | Swagger UI | API Docs |
 |---------|------------|----------|
-| API Gateway | http://localhost:8080/swagger-ui.html | [Gateway API](./docs/api/gateway.md) |
-| User Service | http://localhost:8082/swagger-ui.html | [User API](./docs/api/user-service.md) |
-| Task Service | http://localhost:8084/swagger-ui.html | [Task API](./docs/api/task-service.md) |
-| Notification Service | http://localhost:8085/swagger-ui.html | [Notification API](./docs/api/notification-service.md) |
+| User Service | http://localhost:8082/swagger-ui/index.html | [User API](http://localhost:8082/v3/api-docs) |
+| Task Service | http://localhost:8084/swagger-ui/index.html | [Task API](http://localhost:8084/v3/api-docs) |
+| Notification Service | http://localhost:8085/swagger-ui/index.html | [Notification API](http://localhost:8085/v3/api-docs) |
 
 ## 🔧 Configuration
 

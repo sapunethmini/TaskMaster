@@ -4,3 +4,15 @@
 [submodule "TaskMaster-ApiGetway"]
 	path = TaskMaster-ApiGetway
 	url = https://github.com/sapunethmini/TaskMaster-ApiGetway.git
+[submodule "TaskMaster-TaskService"]
+	path = TaskMaster-TaskService
+	url = https://github.com/sapunethmini/TaskMaster-TaskService.git
+[submodule "TaskMaster-NotificationService"]
+	path = TaskMaster-NotificationService
+	url = https://github.com/sapunethmini/TaskMaster-NotificationService.git
+[submodule "TaskMaster-EurekaServer"]
+	path = TaskMaster-EurekaServer
+	url = https://github.com/sapunethmini/TaskMaster-EurekaServer.git
+[submodule "TaskMaster-UserManagementService"]
+	path = TaskMaster-UserManagementService
+	url = https://github.com/sapunethmini/TaskMaster-UserManagementService.git
